@@ -21,6 +21,9 @@ namespace JayLauncher
 
         static void Start(string[] args)
         {
+            string exepath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "jay.exe");
+
+            CheckFilePath(exepath, args);
             ProcessStartInfo info = new ProcessStartInfo()
             {
                 CreateNoWindow = false,
@@ -48,6 +51,27 @@ namespace JayLauncher
             p.Dispose();
 
             File.WriteAllText(args[3], output.ToString(), Encoding.UTF8);
+        }
+
+        static void CheckFilePath(string exepath, string[] args)
+        {
+            if (!File.Exists(exepath))
+            {
+                Console.Error.Write("jay.exe is not found.");
+                Environment.Exit(1);
+            }
+
+            if (!File.Exists(args[1]))
+            {
+                Console.Error.Write("grammar_jay file is not found.");
+                Environment.Exit(1);
+            }
+
+            if (!File.Exists(args[2]))
+            {
+                Console.Error.Write("skeleton_cs file is not found.");
+                Environment.Exit(1);
+            }
         }
     }
 }
