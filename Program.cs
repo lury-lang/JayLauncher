@@ -24,6 +24,8 @@ namespace JayLauncher
             string exepath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "jay.exe");
 
             CheckFilePath(exepath, args);
+            CheckModification(args);
+
             ProcessStartInfo info = new ProcessStartInfo()
             {
                 CreateNoWindow = false,
@@ -32,7 +34,7 @@ namespace JayLauncher
                 RedirectStandardInput = true,
                 RedirectStandardOutput = true,
                 UseShellExecute = false,
-                FileName = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "jay.exe"),
+                FileName = exepath,
                 Arguments = args[0] + " " + args[1],
                
             };
@@ -71,6 +73,19 @@ namespace JayLauncher
             {
                 Console.Error.Write("skeleton_cs file is not found.");
                 Environment.Exit(1);
+            }
+        }
+
+        static void CheckModification(string[] args)
+        {
+            var jaytime = File.GetLastWriteTime(args[1]);
+            var skeletontime = File.GetLastWriteTime(args[2]);
+            var outputtime = File.GetLastWriteTime(args[3]);
+
+            if (outputtime > jaytime && outputtime > skeletontime)
+            {
+                Console.Error.Write("Everything is up-to-date.");
+                Environment.Exit(0);
             }
         }
     }
