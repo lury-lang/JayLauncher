@@ -21,7 +21,7 @@ namespace JayLauncher
 
         static void Start(string[] args)
         {
-            string exepath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "jay.exe");
+            string exepath = GetExecutionPath();
 
             CheckFilePath(exepath, args);
             CheckModification(args);
@@ -36,7 +36,6 @@ namespace JayLauncher
                 UseShellExecute = false,
                 FileName = exepath,
                 Arguments = args[0] + " " + args[1],
-               
             };
 
             string str = File.ReadAllText(args[2]);
@@ -87,6 +86,47 @@ namespace JayLauncher
                 Console.Error.Write("Everything is up-to-date.");
                 Environment.Exit(0);
             }
+        }
+
+        static string GetExecutionPath()
+        {
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+            {
+                return Path.Combine(GetAssemblyLocation(), "jay", "windows", "jay.exe");
+            }
+            else
+            {
+                var jayPath = Path.Combine(GetAssemblyLocation(), "jay", "unix", "jay");
+
+                if (!File.Exists(jayPath))
+                {
+                    ProcessStartInfo info = new ProcessStartInfo()
+                    {
+                        CreateNoWindow = false,
+                        ErrorDialog = false,
+                        FileName = "make",
+                        WorkingDirectory = Path.Combine(GetAssemblyLocation(), "jay", "unix")
+                    };
+
+                    using (var p = Process.Start(info))
+                    {
+                        p.WaitForExit();
+
+                        if (p.ExitCode != 0)
+                        {
+                            Console.Error.Write("make exited abnormally! : {0}", p.ExitCode);
+                            Environment.Exit(1);
+                        }
+                    }
+                }
+
+                return jayPath;
+            }
+        }
+
+        static string GetAssemblyLocation()
+        {
+            return Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         }
     }
 }
