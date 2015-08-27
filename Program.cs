@@ -58,19 +58,19 @@ namespace JayLauncher
         {
             if (!File.Exists(exepath))
             {
-                Console.Error.Write("jay.exe is not found.");
+                Console.Error.Write("jay is not found: {0}", exepath);
                 Environment.Exit(1);
             }
 
             if (!File.Exists(args[1]))
             {
-                Console.Error.Write("grammar_jay file is not found.");
+                Console.Error.Write("grammar_jay file is not found: {0}", args[1]);
                 Environment.Exit(1);
             }
 
             if (!File.Exists(args[2]))
             {
-                Console.Error.Write("skeleton_cs file is not found.");
+                Console.Error.Write("skeleton_cs file is not found: {0}", args[2]);
                 Environment.Exit(1);
             }
         }
@@ -83,7 +83,7 @@ namespace JayLauncher
 
             if (outputtime > jaytime && outputtime > skeletontime)
             {
-                Console.Error.Write("Everything is up-to-date.");
+                Console.Write("Everything is up-to-date.");
                 Environment.Exit(0);
             }
         }
