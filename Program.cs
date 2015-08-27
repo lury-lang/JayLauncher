@@ -40,16 +40,23 @@ namespace JayLauncher
 
             string str = File.ReadAllText(args[2]);
             StringBuilder output = new StringBuilder();
-            var p = Process.Start(info);
 
-            p.OutputDataReceived += (s, e) => output.AppendLine(e.Data);
-            p.BeginOutputReadLine();
+            using (var p = Process.Start(info))
+            {
+                p.OutputDataReceived += (s, e) => output.AppendLine(e.Data);
+                p.BeginOutputReadLine();
 
-            p.StandardInput.Write(str);
-            p.StandardInput.Dispose();
+                p.StandardInput.Write(str);
+                p.StandardInput.Dispose();
 
-            p.WaitForExit();
-            p.Dispose();
+                p.WaitForExit();
+
+                if (p.ExitCode != 0)
+                {
+                    Console.Error.Write("jay exited abnormally! : {0}", p.ExitCode);
+                    Environment.Exit(1);
+                }
+            }
 
             File.WriteAllText(args[3], output.ToString(), Encoding.UTF8);
         }
